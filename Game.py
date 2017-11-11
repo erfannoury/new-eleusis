@@ -112,6 +112,7 @@ class Game:
 
         #####CHANGE LATER####
         self.hypothesis_set = [self.getRandomRule()]
+        print("The current guess is",self.hypothesis_set[0])
         ####################
 
         for turn in range(20):
@@ -199,7 +200,8 @@ class Game:
         (only called for the first turn)
         :return:
         '''
-        #Keeps getting sets of three random cards until they work
+        #Keeps getting sets of three random cards until we have three that have worked as "current"
+        #This is because for a 1-card rule, the first two cards don't matter
         shuffleList = ALL_CARDS
         random.shuffle(shuffleList)
         for card1 in shuffleList:
@@ -211,11 +213,21 @@ class Game:
                         continue
                     if self.true_rule.evaluate([card1,card2,card3]):
                         for secondCard in shuffleList:
+                            if secondCard == card2 or secondCard == card3:
+                                continue
                             if self.true_rule.evaluate([card2, card3,secondCard]):
-                                return [card3,secondCard]
-                    else:
-                        print("failed",[card1,card2,card3])
-                        exit()
+                                for thirdCard in shuffleList:
+                                    if thirdCard == secondCard or thirdCard == card3:
+                                        continue
+                                    if self.true_rule.evaluate([card3, secondCard, thirdCard]):
+                                        return [secondCard,thirdCard]
+                                    #else:
+                                        #print([card3, secondCard, thirdCard],"not valid")
+                                        #exit()
+                    #else:
+                        #print([card1,card2,card3],"Not valid")
+                        #exit()
+
 
     def getAllValidSequences(self, rule):
         '''
@@ -223,10 +235,15 @@ class Game:
         :param rule:
         :return:
         '''
+        #print("Evaluating",rule)
         goodList = []
         for card1 in ALL_CARDS:
             for card2 in ALL_CARDS:
+                if card1 == card2:
+                    continue
                 for card3 in ALL_CARDS:
+                    if card3 == card2 or card3 == card1:
+                        continue
                     if rule.evaluate([card1, card2, card3]):
                         goodList.append(card1+card2+card3)
         return goodList
@@ -237,18 +254,18 @@ class Game:
         (For testing purposes)
         :return:
         '''
-        theRule = "if("+self.getMiniRandomRule()+", "+random.choice(["True","False"])+")"
+        theRule = self.getMiniRandomRule()#"iff("+self.getMiniRandomRule()+", True, False)"
         print(theRule)
         return parse(theRule)
 
 
-    def getMiniRandomRule(self,rand = None):
+    def getMiniRandomRule(self,rand = 0):
         '''
 
         :param type:
         :return:
         '''
-        possible_cards = ["current", "prev", "prev2"]
+        possible_cards = ["current", "previous", "previous2"]
         possible_values = ["color","suit","is_royal","even",'odd',"value"]
         possible_value_dict = {"color": ["R", "B"],
                                "suit": ["D", "H", "S", "C"],
@@ -259,25 +276,26 @@ class Game:
         two_items_rules = ["equal","greater","less","plus1","minus1"]
         two_items_rules_dict = {"equal": ["value", "suit", "color", "is_royal", "even"],
                            "greater": ["value"],
-                           "less": ["value"],
-                           "plus1": ["value"],
-                           "minus1": ["value"]}
+                           "less": ["value"]}
+                            #TOOK out these two as they were constantly throwing errors
+                           #"plus1": ["value"],
+                           #"minus1": ["value"]}
 
         conjunctions = ["and", "or"]
         # generate a random number between 1 and 10
-        if not rand:
+        if rand == 0:
             rand = random.randint(1, 11)
         if rand <= 4:
             #return a 1-item rule of some property applied to one card
             value = random.choice(possible_values)
             card = random.choice(possible_cards)
-            return value+"("+ card+"), "+ random.choice(possible_value_dict[value])+")"
+            return "equal("+value + "(" + card + "), " + random.choice(possible_value_dict[value]) + ")"
         elif rand <= 9:
             #Return a 2-item rule of some property
             comparison = random.choice(two_items_rules)
             value = random.choice(two_items_rules_dict[comparison])
             card1 = "current"
-            card2 = random.choice(["prev","prev2"])
+            card2 = random.choice(["previous","previous2"])
 
             return comparison+"("+value+"("+card1+"), "+value+"("+card2+"))"
         else:

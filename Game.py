@@ -237,7 +237,7 @@ class Game:
         (For testing purposes)
         :return:
         '''
-        theRule = "iff("+self.getMiniRandomRule()+", "+random.choice(["True","False"])+")"
+        theRule = "if("+self.getMiniRandomRule()+", "+random.choice(["True","False"])+")"
         print(theRule)
         return parse(theRule)
 

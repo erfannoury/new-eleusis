@@ -213,6 +213,9 @@ class Game:
                         for secondCard in shuffleList:
                             if self.true_rule.evaluate([card2, card3,secondCard]):
                                 return [card3,secondCard]
+                    else:
+                        print("failed",[card1,card2,card3])
+                        exit()
 
     def getAllValidSequences(self, rule):
         '''
@@ -247,13 +250,12 @@ class Game:
         '''
         possible_cards = ["current", "prev", "prev2"]
         possible_values = ["color","suit","is_royal","even",'odd',"value"]
-        possible_value_dict = {"color": ["'R'", "'B'"],
-                               "suit": ["'D'", "'H'", "'S'", "'C'"],
+        possible_value_dict = {"color": ["R", "B"],
+                               "suit": ["D", "H", "S", "C"],
                                "is_royal": ["True", "False"],
                                "even": ["True", "False"],
                                "odd": ["True", "False"],
-                               "value": ["'A'", "'2'", "'3'", "'4'", "'5'", "'6'", "'7'", "'8'", "'9'", "'10'",
-                                         "'J'", "'Q'", "'K'"]}
+                               "value": ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]}
         two_items_rules = ["equal","greater","less","plus1","minus1"]
         two_items_rules_dict = {"equal": ["value", "suit", "color", "is_royal", "even"],
                            "greater": ["value"],

@@ -5,8 +5,8 @@ from Game import *
 
 def main():
     print("Hello! Welcome to the main for new_eleusis.py")
-    #default, do not allow royal cards
-    rule = "iff(is_royal(current), False)"
+    #default, red must follow black
+    rule = "or(equal(color(previous), R),equal(color(current), R))"
     #rule = input("Please input in a rule:")
     theGame = Game()
     print("The rule is",rule)

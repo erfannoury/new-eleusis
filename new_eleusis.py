@@ -1,7 +1,6 @@
 # Trivial functions to be used in the important test functions
 # All require a nonempty string as the argument
 
-import traceback
 
 def is_suit(s):
     """Test if parameter is one of Club, Diamond, Heart, Spade"""
@@ -25,7 +24,6 @@ def is_card(s):
 
 def value_to_number(name):
     """Given the "value" part of a card, returns its numeric value"""
-
     values = [None, 'A', '2', '3', '4', '5', '6',
               '7', '8', '9', '10', 'J', 'Q', 'K']
     return values.index(name)
@@ -75,20 +73,15 @@ def less(a, b):
        colors, or values. For suits: C < D < H < S. For colors,
        B < R. For cards, suits are considered first, then values.
        Values are compared numerically."""
-    try:
-        if is_card(str(a)):
-            if suit(a) != suit(b):
-                return suit(a) < suit(b)
-            else:
-                return value(a) < value(b)
-        elif is_value(str(a)):
-            return a < b#value_to_number(a) < value_to_number(b)
+    if is_card(a):
+        if suit(a) != suit(b):
+            return suit(a) < suit(b)
         else:
-            return a < b
-    except Exception as e:
-        print("################")
-        print(e)
-        exit()
+            return value(a) < value(b)
+    elif is_value(a):
+        return value_to_number(a) < value_to_number(b)
+    else:
+        return a < b
 
 
 def greater(a, b):
@@ -99,8 +92,7 @@ def greater(a, b):
 def plus1(x):
     """Returns the next higher value, suit, or card in a suit;
        must be one. If a color, returns the other color"""
-    #print("In plus1:",x)
-    if is_value(str(x)):
+    if is_value(x):
         assert value_to_number(x) < 13
         return number_to_value(value_to_number(x) + 1)
     elif is_suit(x):
@@ -115,8 +107,7 @@ def plus1(x):
 def minus1(x):
     """Returns the next lower value, suit, or card in a suit;
        must be one. If a color, returns the other color"""
-    #print("In minus1:",x)
-    if is_value(str(x)):
+    if is_value(x):
         assert value_to_number(x) > 1
         return number_to_value(value_to_number(x) - 1)
     elif is_suit(x):
@@ -293,23 +284,21 @@ class Tree:
             s += ", " + repr(self.test)
         return s + ")"
 
-#    debugging = True
-#    def evaluate(self, cards):
-#        """For debugging, uncomment these lines and change
-#           the name of evaluate (below) to evaluate"""
-#        before = str(self)
-#        after = self.evaluate2(cards)
-#        if self.debugging: print "Tree: ", before, "-->", after
-#        return after
+##    debugging = True
+# def evaluate(self, cards):
+# """For debugging, uncomment these lines and change
+# the name of evaluate (below) to evaluate"""
+##        before = str(self)
+##        after = self.evaluate2(cards)
+# if self.debugging: print "Tree: ", before, "-->", after
+# return after
 
     def evaluate(self, cards):
         """Evaluate this tree with the given card values"""
         def subeval(expr):
-            #print("the expression for subeval:",expr)
             if expr.__class__.__name__ == "Tree":
                 return expr.evaluate(cards)
             else:
-                #print("the current cards",current,previous,previous2)
                 if expr == "current":
                     return current
                 elif expr == "previous":
@@ -325,20 +314,11 @@ class Tree:
                 return f
 
             if f in [suit, color, value, is_royal, minus1, plus1, even, odd]:
-                #try:
-                    return f(subeval(self.left))
-                #except:
-                    #print("evaluating function with", cards)
-                    #print("self.left is", self.left)
+                return f(subeval(self.left))
 
             elif f in [equal, less, greater]:
-                #try:
-                    #print("About to call less",self.left,self.right)
-                    return f(subeval(self.left), subeval(self.right))
-                #except:
-                    #print("evaluating function with", cards)
-                    #print("self.left is", self.left)
-                    #print("self.right is", self.right)
+                return f(subeval(self.left), subeval(self.right))
+
             elif f == andf:
                 if subeval(self.left):
                     return subeval(self.right)

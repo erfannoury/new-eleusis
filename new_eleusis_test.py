@@ -246,7 +246,7 @@ class TestNewEleusis(unittest.TestCase):
         self.assertFalse(p.evaluate(cards1))
         self.assertTrue(p.evaluate(cards2))
         self.assertFalse(p.evaluate(cards3))
-        self.assertFalse(p.evaluate(("5H", "5D", "QC")))
+        self.assertTrue(p.evaluate(("5H", "5D", "QC")))
         self.assertFalse(p.evaluate(("5H", "5D", "5C")))
 
     def test_scan(self):

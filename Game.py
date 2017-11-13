@@ -3,7 +3,7 @@ Contains the Game class
 '''
 from new_eleusis import *
 import random
-from itertools import product
+from itertools import combinations
 '''
 Game has these private variables:
 rule - the rule from the user
@@ -141,6 +141,7 @@ class Game:
     def score(self):
         '''
         This function returns a score for this move in the game
+        NOTE: NEED TO ADD THE +30 FOR A RULE THAT DOESN'T DESCRIBE ALL CARDS
         :return:
         '''
         score = 0
@@ -161,7 +162,7 @@ class Game:
         validGuess = set(self.getAllValidSequences(guessedRule))
 
         #If the two sets of valid sequences are the same, the rules are the same
-        if len(validGuess - validReal) > 0 or len(validReal - validGuess) > 0:
+        if len(validGuess ^ validReal) > 0:
             score += 15
         return score
 
@@ -210,9 +211,7 @@ class Game:
         #This is because for a 1-card rule, the first two cards don't matter
         shuffleList = ALL_CARDS
         random.shuffle(shuffleList)
-        for card1, card2, card3 in product(shuffleList, repeat=3):
-            if card3 == card2 or card3 == card1 or card1 == card2:
-                continue
+        for card1, card2, card3 in combinations(shuffleList, r=3):
             if self.true_rule.evaluate([card1,card2,card3]):
                 for card4 in shuffleList:
                     if card4 == card3 or card4 == card2:
@@ -231,9 +230,7 @@ class Game:
         '''
         #print("Evaluating",rule)
         goodList = []
-        for card1, card2, card3 in product(ALL_CARDS, repeat=3):
-            if card3 == card2 or card3 == card1 or card1 == card2:
-                continue
+        for card1, card2, card3 in combinations(ALL_CARDS, r=3):
             if rule.evaluate([card1, card2, card3]):
                 goodList.append(card1+card2+card3)
         return goodList

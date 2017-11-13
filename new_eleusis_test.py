@@ -1,6 +1,7 @@
 import unittest
 from new_eleusis import *
 
+
 class TestNewEleusis(unittest.TestCase):
 
     def test_is_suit(self):
@@ -128,11 +129,11 @@ class TestNewEleusis(unittest.TestCase):
         return Tree(root, left, right).evaluate(cards)
 
     def eval_if_tree(self, root, left=None, right=None, test=True,
-                  cards=("3H", "5D", "AS")):
+                     cards=("3H", "5D", "AS")):
         """Shortcut for creating and evaluating a Tree"""
         return Tree(root, left, right, test).evaluate(cards)
 
-##    def test_simple_evaluate(self):
+# def test_simple_evaluate(self):
 ##        self.assertEqual("AS", self.eval_tree("current"))
 ##        self.assertEqual("5D", self.eval_tree("previous"))
 ##        self.assertEqual("3H", self.eval_tree("previous2"))
@@ -193,15 +194,16 @@ class TestNewEleusis(unittest.TestCase):
 
         cards = ("3D", "7H", "AC")
         self.assertEqual("5H", self.eval_if_tree(iff, True, "5H", "AS"), cards)
-        self.assertEqual("AS", self.eval_if_tree(iff, False, "5H", "AS"), cards)
+        self.assertEqual("AS", self.eval_if_tree(
+            iff, False, "5H", "AS"), cards)
 
-##    def test_tree(self):
-##        self.assertEqual("""Tree(iff(Tree(equal(Tree(suit('previous')),
-##                                             Tree(suit('previous2')))),
-##                                  Tree(is_royal('current')),
-##                                  Tree(notf(Tree(is_royal('current'))))))""",
-##                          tree("""iff(equal(suit(previous), suit(previous2)),
-##                                  is_royal(current), notf(is_royal(current)))"""))
+# def test_tree(self):
+# self.assertEqual("""Tree(iff(Tree(equal(Tree(suit('previous')),
+# Tree(suit('previous2')))),
+# Tree(is_royal('current')),
+# Tree(notf(Tree(is_royal('current'))))))""",
+# tree("""iff(equal(suit(previous), suit(previous2)),
+# is_royal(current), notf(is_royal(current)))"""))
 
     def test_evaluate_rules(self):
         cards1 = ("3D", "7D", "AH")
@@ -209,14 +211,17 @@ class TestNewEleusis(unittest.TestCase):
         cards3 = ("4H", "5H", "KH")
 
         # Red must follow black
-        self.assertTrue(parse("""or(equal(color(previous), R),
-                                 equal(color(current), R))""").evaluate(cards1))
-        self.assertTrue(Tree(orf,
-             Tree(equal, Tree(color, "previous"), "R"),
-             Tree(equal, Tree(color, "current"), "R") ).evaluate(cards1))
-        self.assertFalse(Tree(orf,
-             Tree(equal, Tree(color, "previous"), "R"),
-             Tree(equal, Tree(color, "current"), "R") ).evaluate(cards2))
+        self.assertTrue(parse(
+            """or(equal(color(previous), R),
+            equal(color(current), R))""").evaluate(cards1))
+        self.assertTrue(Tree(
+            orf,
+            Tree(equal, Tree(color, "previous"), "R"),
+            Tree(equal, Tree(color, "current"), "R")).evaluate(cards1))
+        self.assertFalse(Tree(
+            orf,
+            Tree(equal, Tree(color, "previous"), "R"),
+            Tree(equal, Tree(color, "current"), "R")).evaluate(cards2))
         # Red must follow black, using parser
         p = parse("iff(equal(color(previous), B), equal(color(current), R), True)")
         self.assertTrue(p.evaluate(cards1))
@@ -244,13 +249,14 @@ class TestNewEleusis(unittest.TestCase):
         self.assertFalse(p.evaluate(("5H", "5D", "QC")))
         self.assertFalse(p.evaluate(("5H", "5D", "5C")))
 
-
     def test_scan(self):
-        self.assertEqual(['equal', '(', 'color', '(', 'previous', ')', 'R', ')'],
-                         list(scan("equal(color(previous), R)")) )
-        self.assertEqual(['iff', '(', 'equal', '(', 'previous', 'B', ')', 'equal', '(',
-                          'current', '(', 'R', ')', ')', 'False', ')'],
-                         list(scan("iff(equal(previous, B), equal(current(R)), False)")) )
+        self.assertEqual(
+            ['equal', '(', 'color', '(', 'previous', ')', 'R', ')'],
+            list(scan("equal(color(previous), R)")))
+        self.assertEqual(
+            ['iff', '(', 'equal', '(', 'previous', 'B', ')', 'equal', '(',
+             'current', '(', 'R', ')', ')', 'False', ')'],
+            list(scan("iff(equal(previous, B), equal(current(R)), False)")))
 
     def test_parse(self):
         self.assertEqual(str(Tree(equal, Tree(color, 'previous'), 'R')),
@@ -258,4 +264,6 @@ class TestNewEleusis(unittest.TestCase):
         self.assertEqual(repr(Tree(equal, Tree(color, 'previous'), 'R')),
                          repr(parse("equal(color(previous), R)")))
 
-unittest.main()
+
+if __name__ == '__main__':
+    unittest.main()

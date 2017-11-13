@@ -3,6 +3,7 @@ Contains the Game class
 '''
 from new_eleusis import *
 import random
+from itertools import product
 '''
 Game has these private variables:
 rule - the rule from the user
@@ -21,19 +22,20 @@ class Game:
     def __init__(self, board_state = None, hypothesis_set = None):
         '''
         The constructor for the Game class
-        :param rule:
-        :param board_state:
-        :param hypothesis_set:
+        :param board_state: the set of tuples representing the cards played
+         = [(a1, [r1,r2]), .... etc.]
+        :param hypothesis_set: A 2D list of mini-rules. The inner list gets and'd together and
+        the result of that gets or'd together (the random implementation does not support this currently)
         '''
         #Note the true rule gets defined later
         self.board_state = board_state
         self.hypothesis_set = hypothesis_set
 
         #If they are not initialized, make them empty lists
-        if not board_state:
+        if board_state is None:
             self.board_state = []
             self.hypothesis_set = []
-        if not hypothesis_set:
+        if hypothesis_set is None:
             self.hypothesis_set = []
 
 
@@ -47,7 +49,7 @@ class Game:
     def setRule(self, rule_expr):
         '''
         This function sets the rule for a game
-        :param rule_expr:
+        :param rule_expr: takes in the string rule from the user
         :return:
         '''
         try:
@@ -55,7 +57,7 @@ class Game:
             self.true_rule = rule_tree
             self.true_valid = self.getAllValidSequences(rule_tree)
         except:
-            print("Invalid rule")
+            raise ValueError("Invalid Rule")
 
     def boardState(self):
         '''
@@ -76,25 +78,28 @@ class Game:
         '''
         This function adapts the rules for when a card is accepted
         (if necessary)
-        :param card:
+        :param card: the card that was accepted
         :return:
         '''
         #Note: Currently, this does nothing
+        pass
 
     def applyRejectedCard(self,card):
         '''
         This function adapts the rules for when a card is rejected
         (if necessary)
-        :param card:
+        :param card: the card that was rejected
         :return:
         '''
         #Note: Currently, this does nothing
+        pass
 
     def simplifyRules(self):
         '''
         This function gets rid of any redundant rules
         :return:
         '''
+        pass
 
 
     def scientist(self):
@@ -119,12 +124,11 @@ class Game:
             print("Turn:",turn)
             chosen = self.chooseCard()
             print("Playing",chosen,"card")
-            accepted = self.play(chosen)
-            if accepted:
-                print("Card was legal")
+            if self.play(chosen):
+                print(chosen,"was legal")
                 self.applyAcceptedCard(chosen)
             else:
-                print("Card was illegal")
+                print(chosen,"was illegal")
                 self.applyRejectedCard(chosen)
             self.simplifyRules()
             print("Current Score is", self.score())
@@ -165,7 +169,7 @@ class Game:
         '''
         plays the card and returns whether or not it was valid.
         Also adds it to the board state
-        :param card:
+        :param card: the card that the player plays
         :return:
         '''
         previous = self.board_state[-1][0]
@@ -188,10 +192,12 @@ class Game:
     def findDifferences(self,cardList1,cardList2):
         '''
         This function finds what is different about a card from others
+        NOTE: this function may be unnecessary for the 1st strategy
         :param cardList1:
         :param cardList2:
         :return:
         '''
+        pass
 
 
     def getValidCards(self):
@@ -204,48 +210,32 @@ class Game:
         #This is because for a 1-card rule, the first two cards don't matter
         shuffleList = ALL_CARDS
         random.shuffle(shuffleList)
-        for card1 in shuffleList:
-            for card2 in shuffleList:
-                if card1 == card2:
-                    continue
-                for card3 in shuffleList:
-                    if card1 == card3 or card2 == card3:
+        for card1, card2, card3 in product(shuffleList, repeat=3):
+            if card3 == card2 or card3 == card1 or card1 == card2:
+                continue
+            if self.true_rule.evaluate([card1,card2,card3]):
+                for card4 in shuffleList:
+                    if card4 == card3 or card4 == card2:
                         continue
-                    if self.true_rule.evaluate([card1,card2,card3]):
-                        for secondCard in shuffleList:
-                            if secondCard == card2 or secondCard == card3:
-                                continue
-                            if self.true_rule.evaluate([card2, card3,secondCard]):
-                                for thirdCard in shuffleList:
-                                    if thirdCard == secondCard or thirdCard == card3:
-                                        continue
-                                    if self.true_rule.evaluate([card3, secondCard, thirdCard]):
-                                        return [secondCard,thirdCard]
-                                    #else:
-                                        #print([card3, secondCard, thirdCard],"not valid")
-                                        #exit()
-                    #else:
-                        #print([card1,card2,card3],"Not valid")
-                        #exit()
+                    if self.true_rule.evaluate([card2, card3, card4]):
+                        #returns two cards that have both been "current"
+                        return [card3, card4]
+
 
 
     def getAllValidSequences(self, rule):
         '''
         loops over all possible lists of three cards and returns the list
-        :param rule:
+        :param rule: the rule that we want to find valid cards for
         :return:
         '''
         #print("Evaluating",rule)
         goodList = []
-        for card1 in ALL_CARDS:
-            for card2 in ALL_CARDS:
-                if card1 == card2:
-                    continue
-                for card3 in ALL_CARDS:
-                    if card3 == card2 or card3 == card1:
-                        continue
-                    if rule.evaluate([card1, card2, card3]):
-                        goodList.append(card1+card2+card3)
+        for card1, card2, card3 in product(ALL_CARDS, repeat=3):
+            if card3 == card2 or card3 == card1 or card1 == card2:
+                continue
+            if rule.evaluate([card1, card2, card3]):
+                goodList.append(card1+card2+card3)
         return goodList
 
     def getRandomRule(self):
@@ -262,7 +252,8 @@ class Game:
     def getMiniRandomRule(self,rand = 0):
         '''
 
-        :param type:
+        :param rand: this tells the function which type of rule to make. This is only
+        set when a larger rule wants to create specific smaller rules
         :return:
         '''
         possible_cards = ["current", "previous", "previous2"]

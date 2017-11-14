@@ -1,21 +1,20 @@
 '''
 Contains the Game class
 '''
-from new_eleusis import *
-import random
-from itertools import combinations
+from rule_functions import *
 '''
 Game has these private variables:
 rule - the rule from the user
 played - the list of tuples with accepted and rejected cards ex: [( "5H",["QS"]),( "6C",[])]
 rule_set - 
 
-'''
+
 ALL_CARDS = []
 for suite in ["D","H","S","C"]:
     for value in ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]:
         ALL_CARDS.append(value+suite)
 
+'''
 
 
 class Game:
@@ -55,7 +54,7 @@ class Game:
         try:
             rule_tree = parse(rule_expr)
             self.true_rule = rule_tree
-            self.true_valid = self.getAllValidSequences(rule_tree)
+            self.true_valid = getAllValidSequences(rule_tree)
         except:
             raise ValueError("Invalid Rule")
 
@@ -116,7 +115,7 @@ class Game:
         self.simplifyRules()
 
         #####CHANGE LATER####
-        self.hypothesis_set = [self.getRandomRule()]
+        self.hypothesis_set = [getRandomRule()]
         print("The current guess is",self.hypothesis_set[0])
         ####################
 
@@ -159,7 +158,7 @@ class Game:
 
         guessedRule = self.findBestRule()
         validReal = set(self.true_valid)
-        validGuess = set(self.getAllValidSequences(guessedRule))
+        validGuess = set(getAllValidSequences(guessedRule))
 
         #If the two sets of valid sequences are the same, the rules are the same
         if len(validGuess ^ validReal) > 0:
@@ -190,16 +189,6 @@ class Game:
         #NOTE: right now just returns the whole thing
         return self.hypothesis_set[0]
 
-    def findDifferences(self,cardList1,cardList2):
-        '''
-        This function finds what is different about a card from others
-        NOTE: this function may be unnecessary for the 1st strategy
-        :param cardList1:
-        :param cardList2:
-        :return:
-        '''
-        pass
-
 
     def getValidCards(self):
         '''
@@ -222,73 +211,5 @@ class Game:
 
 
 
-    def getAllValidSequences(self, rule):
-        '''
-        loops over all possible lists of three cards and returns the list
-        :param rule: the rule that we want to find valid cards for
-        :return:
-        '''
-        #print("Evaluating",rule)
-        goodList = []
-        for card1, card2, card3 in combinations(ALL_CARDS, r=3):
-            if rule.evaluate([card1, card2, card3]):
-                goodList.append(card1+card2+card3)
-        return goodList
 
-    def getRandomRule(self):
-        '''
-        Creates a random rule
-        (For testing purposes)
-        :return:
-        '''
-        theRule = self.getMiniRandomRule()#"iff("+self.getMiniRandomRule()+", True, False)"
-        print(theRule)
-        return parse(theRule)
-
-
-    def getMiniRandomRule(self,rand = 0):
-        '''
-
-        :param rand: this tells the function which type of rule to make. This is only
-        set when a larger rule wants to create specific smaller rules
-        :return:
-        '''
-        possible_cards = ["current", "previous", "previous2"]
-        possible_values = ["color","suit","is_royal","even",'odd',"value"]
-        possible_value_dict = {"color": ["R", "B"],
-                               "suit": ["D", "H", "S", "C"],
-                               "is_royal": ["True", "False"],
-                               "even": ["True", "False"],
-                               "odd": ["True", "False"],
-                               "value": ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]}
-        two_items_rules = ["equal","greater","less","plus1","minus1"]
-        two_items_rules_dict = {"equal": ["value", "suit", "color", "is_royal", "even"],
-                           "greater": ["value"],
-                           "less": ["value"]}
-                            #TOOK out these two as they were constantly throwing errors
-                           #"plus1": ["value"],
-                           #"minus1": ["value"]}
-
-        conjunctions = ["and", "or"]
-        # generate a random number between 1 and 10
-        if rand == 0:
-            rand = random.randint(1, 11)
-        if rand <= 4:
-            #return a 1-item rule of some property applied to one card
-            value = random.choice(possible_values)
-            card = random.choice(possible_cards)
-            return "equal("+value + "(" + card + "), " + random.choice(possible_value_dict[value]) + ")"
-        elif rand <= 9:
-            #Return a 2-item rule of some property
-            comparison = random.choice(two_items_rules)
-            value = random.choice(two_items_rules_dict[comparison])
-            card1 = "current"
-            card2 = random.choice(["previous","previous2"])
-
-            return comparison+"("+value+"("+card1+"), "+value+"("+card2+"))"
-        else:
-            #return a conjunctive rule
-            conjunction = random.choice(conjunctions)
-
-            return conjunction + "("+self.getMiniRandomRule(6)+","+self.getMiniRandomRule(6)+")"
 

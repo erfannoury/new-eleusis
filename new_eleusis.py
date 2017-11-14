@@ -73,13 +73,17 @@ def less(a, b):
        colors, or values. For suits: C < D < H < S. For colors,
        B < R. For cards, suits are considered first, then values.
        Values are compared numerically."""
-    if is_card(a):
+    #had to fix this so if you passed in greater(value(card),value(card)) it wouldn't error
+    if is_value(str(a)):
+        if a in ["J","Q","K","A"] or b in ["J","Q","K","A"]:
+            return value_to_number(a) < value_to_number(b)
+        else:
+            return a < b
+    elif is_card(a):
         if suit(a) != suit(b):
             return suit(a) < suit(b)
         else:
             return value(a) < value(b)
-    elif is_value(a):
-        return value_to_number(a) < value_to_number(b)
     else:
         return a < b
 

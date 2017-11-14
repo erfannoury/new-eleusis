@@ -2,19 +2,6 @@
 Contains the Game class
 '''
 from rule_functions import *
-'''
-Game has these private variables:
-rule - the rule from the user
-played - the list of tuples with accepted and rejected cards ex: [( "5H",["QS"]),( "6C",[])]
-rule_set - 
-
-
-ALL_CARDS = []
-for suite in ["D","H","S","C"]:
-    for value in ["A","2","3","4","5","6","7","8","9","10","J","Q","K"]:
-        ALL_CARDS.append(value+suite)
-
-'''
 
 
 class Game:

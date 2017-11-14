@@ -37,14 +37,14 @@ def getRulesForSequence(cards):
     prev2Set = set(getRulesForOneCard(cards[0]))
 
     #select the one-card rules that overlap for all three
-    all_one_card_rules = list((curSet & prevSet) & prev2Set)
+    all_one_card_rules = list(curSet & prevSet & prev2Set)
 
     #for each pair of (previous2,previous) and (previous,current), get the 2-card rules
-    prev_curr = getRulesForTwoCards([cards[1],cards[2]])
+    prev_curr = set(getRulesForTwoCards([cards[1],cards[2]]))
     prev2_prev = set(getRulesForTwoCards(([cards[0],cards[1]])))
 
     #If there is overlap, add two-card rules based on current and previous
-    all_two_card_rules = list(set(prev_curr) & prev2_prev)
+    all_two_card_rules = list(prev_curr & prev2_prev)
 
     #Get the three-card rules
     all_three_card_rules = getRulesForThreeCards(cards)
@@ -64,7 +64,7 @@ def getRulesForThreeCards(cards):
     :return: a list of three-card rules that describe all the cards (as strings)
     '''
     prev_curr = getRulesForTwoCards([cards[1], cards[2]])
-    prev2_prev = getRulesForTwoCards(([cards[0], cards[1]]), "previous2", "previous")
+    prev2_prev = getRulesForTwoCards(([cards[0], cards[1]]), type1="previous2", type2="previous")
     three_rules = []
 
     for rule1 in prev2_prev:
@@ -121,6 +121,8 @@ def getRulesForTwoCards(cards,type1 = "previous",type2 = "current"):
     for func in same_funcs:
         if same_funcs[func](cards[0]) == same_funcs[func](cards[1]):
             all_pair_rules.append("equal("+func+"("+type1+"), "+func+"("+type2+"))")
+        else:
+            all_pair_rules.append("not(equal(" + func + "(" + type1 + "), " + func + "(" + type2 + ")))")
 
     #Is one card greater than the other in value:
     if greater(value(cards[0]),value(cards[1])):
@@ -144,8 +146,8 @@ def getRulesForTwoCards(cards,type1 = "previous",type2 = "current"):
 
 
     #Make rules for specific "this value" followed by "this value' so red->black will be there with color1 != color2
-    prev_rules = getRulesForOneCard(cards[0],type1)
-    cur_rules = getRulesForOneCard(cards[1],type2)
+    prev_rules = getRulesForOneCard(cards[0],type=type1)
+    cur_rules = getRulesForOneCard(cards[1],type=type2)
     for i in range(len(prev_rules)):
         all_pair_rules.append("and("+prev_rules[i]+", "+cur_rules[i]+")")
 
@@ -222,25 +224,25 @@ def getMiniRandomRule(rand=0):
                             "less": ["value"]}
     #not using plus1 or minus1 because they are a bit more complicated
 
-    conjunctions = ["and", "or"]
+    operators = ["and", "or"]
     # generate a random number between 1 and 10
     if rand == 0:
         rand = random.randint(1, 11)
     if rand <= 4:
         # return a 1-item rule of some property applied to one card
-        value = random.choice(possible_values)
+        val = random.choice(possible_values)
         card = random.choice(possible_cards)
-        return "equal(" + value + "(" + card + "), " + random.choice(possible_value_dict[value]) + ")"
+        return "equal(" + val + "(" + card + "), " + random.choice(possible_value_dict[val]) + ")"
     elif rand <= 9:
         # Return a 2-item rule of some property
         comparison = random.choice(two_items_rules)
-        value = random.choice(two_items_rules_dict[comparison])
+        val = random.choice(two_items_rules_dict[comparison])
         card1 = "current"
         card2 = random.choice(["previous", "previous2"])
 
-        return comparison + "(" + value + "(" + card1 + "), " + value + "(" + card2 + "))"
+        return comparison + "(" + val + "(" + card1 + "), " + val + "(" + card2 + "))"
     else:
         # return a conjunctive rule
-        conjunction = random.choice(conjunctions)
+        conjunction = random.choice(operators)
 
         return conjunction + "(" + getMiniRandomRule(6) + "," + getMiniRandomRule(6) + ")"

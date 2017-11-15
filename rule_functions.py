@@ -318,22 +318,6 @@ def combineListOfRules(ruleList):
 def getRandomRule():
     """
     Creates a random rule tree
-    (For testing purposes)
-
-    Returns
-    -------
-    theRule: Tree
-        A random rule tree
-    :return:
-    """
-
-    theRule = parse(getMiniRandomRule(rand))
-    return theRule
-
-
-def getRandomRule():
-    """
-    Creates a random rule tree
 
     Returns
     -------

@@ -134,12 +134,12 @@ class TestNewEleusis(unittest.TestCase):
         return Tree(root, left, right, test).evaluate(cards)
 
 # def test_simple_evaluate(self):
-##        self.assertEqual("AS", self.eval_tree("current"))
-##        self.assertEqual("5D", self.eval_tree("previous"))
-##        self.assertEqual("3H", self.eval_tree("previous2"))
-##        self.assertEqual("9C", self.eval_tree("9C"))
-##        self.assertEqual(True, self.eval_tree(True))
-##        self.assertEqual(False, self.eval_tree(False))
+#        self.assertEqual("AS", self.eval_tree("current"))
+#        self.assertEqual("5D", self.eval_tree("previous"))
+#        self.assertEqual("3H", self.eval_tree("previous2"))
+#        self.assertEqual("9C", self.eval_tree("9C"))
+#        self.assertEqual(True, self.eval_tree(True))
+#        self.assertEqual(False, self.eval_tree(False))
 
     def test_unary_evaluate(self):
         self.assertEqual("S", self.eval_tree(suit, "AS"))
@@ -223,7 +223,8 @@ class TestNewEleusis(unittest.TestCase):
             Tree(equal, Tree(color, "previous"), "R"),
             Tree(equal, Tree(color, "current"), "R")).evaluate(cards2))
         # Red must follow black, using parser
-        p = parse("iff(equal(color(previous), B), equal(color(current), R), True)")
+        p = parse(
+            "iff(equal(color(previous), B), equal(color(current), R), True)")
         self.assertTrue(p.evaluate(cards1))
         self.assertFalse(p.evaluate(cards2))
         self.assertTrue(p.evaluate(cards3))

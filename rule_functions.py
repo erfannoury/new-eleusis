@@ -12,6 +12,32 @@ for deck in ["D", "H", "S", "C"]:
         ALL_CARDS.append(num+deck)
 
 
+def negate_rule(rule):
+    """
+    Negates the given rule expression
+
+    Parameters
+    ----------
+    rule: str or new_eleusis.Tree
+        String representation of a rule
+
+    Returns
+    -------
+    negated_rule: str
+        String representation of the negated rule
+    """
+    assert type(rule) in [str, Tree]
+    if type(rule) == Tree:
+        rule = str(rule)
+
+    if rule.startswith('not('):
+        negated_rule = rule[4:-1]
+    else:
+        negated_rule = 'not(' + rule + ')'
+
+    return negated_rule
+
+
 def getAllValidSequences(rule):
     """
     Loops over all possible lists of three cards and returns the list of three

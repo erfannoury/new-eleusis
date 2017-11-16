@@ -27,7 +27,8 @@ def main():
     # The values need to be increasing
     # rule = "if(greater(value(previous), value(current)), True, False)"
 
-    rule = "equal(color(current), R)"
+    #rule = "equal(color(current), R)"
+    rule = "not(equal(suit(previous), suit(current)))"
     # rule = input("Please input in a rule:")
     theGame = Game()
     print("The rule is", rule)

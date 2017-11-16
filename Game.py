@@ -133,8 +133,8 @@ class Game:
         current: str
             The card that was rejected
         """
-        previous = self.board_state[-2][0]
-        previous2 = self.board_state[-3][0]
+        previous = self.board_state[-1][0]
+        previous2 = self.board_state[-2][0]
         cards = [previous2, previous, current]
 
         for rule_set in sorted(self.hypothesis_set, key=lambda rs: len(rs)):
@@ -198,7 +198,7 @@ class Game:
         two_card_rules = getRulesForTwoCards(cards)
 
         self.hypothesis_set.append(one_card_rules + two_card_rules)
-        print("The current guess is", self.hypothesis_set[0])
+        print("The current guess is", combineListOfRules(self.hypothesis_set))
 
         for turn in range(20):
             print("Turn:", turn)

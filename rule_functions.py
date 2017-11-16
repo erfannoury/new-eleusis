@@ -322,6 +322,8 @@ def combineListOfRules(ruleList):
         List of string representation of rules, or list of lists of string
         representation of the rules
 
+    Returns
+    -------
     total_rule: Tree
         The resulting rule tree from combining the given rules
     """

@@ -91,8 +91,8 @@ class Game:
         current: str
             The card that was accepted
         """
-        previous = self.board_state[-1][0]
-        previous2 = self.board_state[-2][0]
+        previous = self.board_state[-2][0]
+        previous2 = self.board_state[-3][0]
         cards = [previous2, previous, current]
 
         # first check to see if any of the rule sets accept this card
@@ -102,7 +102,7 @@ class Game:
                 return
 
         add_new_set = True
-        for rule_set in sorted(self.hypothesis_set, lambda rs: len(rs),
+        for rule_set in sorted(self.hypothesis_set, key=lambda rs: len(rs),
                                reverse=True):
             if not any([parse(r).evaluate(cards) for r in rule_set]):
                 continue
@@ -117,7 +117,7 @@ class Game:
                     rule_set.append(r)
 
         if add_new_set:
-            hypothesis_set.append(getRulesForSequence(cards))
+            self.hypothesis_set.append(getRulesForSequence(cards))
 
     def applyRejectedCard(self, current):
         """
@@ -133,8 +133,8 @@ class Game:
         current: str
             The card that was rejected
         """
-        previous = self.board_state[-1][0]
-        previous2 = self.board_state[-2][0]
+        previous = self.board_state[-2][0]
+        previous2 = self.board_state[-3][0]
         cards = [previous2, previous, current]
 
         for rule_set in sorted(self.hypothesis_set, key=lambda rs: len(rs)):

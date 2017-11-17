@@ -237,7 +237,7 @@ class Game:
 
         guessedRule = self.findBestRule()
         validReal = set(self.true_valid)
-        validGuess = set(getAllValidSequences(guessedRule))
+        validGuess = set(getAllValidSequences(parse(guessedRule)))
 
         # If the two sets of valid sequences are the same,
         # the rules are the same

@@ -85,8 +85,8 @@ def getRulesForSequence(cards):
 
     Returns
     -------
-    all_thress: list
-        A list of rule trees that accept the given sequence of three cards
+    all_rules: list
+        A list of rule strings that accept the given sequence of three cards
     """
     assert len(cards) == 3, 'Three cards should be provided'
 
@@ -115,12 +115,7 @@ def getRulesForSequence(cards):
 
     all_rules = all_one_card_rules + all_two_card_rules + all_three_card_rules
 
-    # turn the rules into trees
-    all_trees = []
-    for rule in all_rules:
-        all_trees.append(parse(rule))
-
-    return all_trees
+    return all_rules
 
 
 def getRulesForThreeCards(cards):

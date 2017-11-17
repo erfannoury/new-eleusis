@@ -3,7 +3,7 @@ This file contains helper functions for rules
 """
 import random
 from new_eleusis import *
-from itertools import combinations
+from itertools import combinations, product
 
 ALL_CARDS = []
 for deck in ["D", "H", "S", "C"]:
@@ -58,17 +58,9 @@ def getAllValidSequences(rule):
         List of three-cards that are accepted by the rule
     """
     goodList = []
-    for card1, card2, card3 in combinations(ALL_CARDS, r=3):
-        if rule.evaluate([card1, card2, card3]):
-            for card4 in ALL_CARDS:
-                if card4 in [card1, card2, card3]:
-                    continue
-                if rule.evaluate([card2, card3, card4]):
-                    for card5 in ALL_CARDS:
-                        if card5 in [card2, card3, card4]:
-                            continue
-                        if rule.evaluate([card3, card4, card5]):
-                            goodList.append(card3 + card4 + card5)
+    for card1, card2, card3 in product(ALL_CARDS, repeat=3):
+        if rule.evaluate([card1,card2,card3]):
+            goodList.append(card1+card2+card3)
     return goodList
 
 

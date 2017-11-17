@@ -284,7 +284,7 @@ def getRulesForTwoCards(cards, cur_name="current", prev_name="previous"):
     for rp, rc in zip(prev_rules, cur_rules):
         # again, remove the rules that are the same for two consecutive cards
         if rp.replace(prev_name, '') != rc.replace(cur_name, ''):
-        all_pair_rules.append("and(" + rp + ", " + rc + ")")
+            all_pair_rules.append("and(" + rp + ", " + rc + ")")
 
     return all_pair_rules
 

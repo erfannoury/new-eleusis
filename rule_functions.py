@@ -240,9 +240,10 @@ def getRulesForTwoCards(cards, cur_name="current", prev_name="previous"):
     # are the value, suit,color royalty, or parity the same?
     for func in same_funcs:
         if same_funcs[func](cur) == same_funcs[func](prev):
-            all_pair_rules.append(
-                "equal(" + func + "(" + cur_name + "), " +
-                func + "(" + prev_name + "))")
+            # when an attribute is equal for two consecutive cards, then this
+            # attribute is a rank-1 attribute and so we don't need to have
+            # these rules
+            continue
         else:
             all_pair_rules.append(
                 "not(equal(" + func + "(" + cur_name + "), " +
@@ -281,6 +282,8 @@ def getRulesForTwoCards(cards, cur_name="current", prev_name="previous"):
     prev_rules = getRulesForOneCard(prev, cur_name=prev_name)
     cur_rules = getRulesForOneCard(cur, cur_name=cur_name)
     for rp, rc in zip(prev_rules, cur_rules):
+        # again, remove the rules that are the same for two consecutive cards
+        if rp.replace(prev_name, '') != rc.replace(cur_name, ''):
         all_pair_rules.append("and(" + rp + ", " + rc + ")")
 
     return all_pair_rules

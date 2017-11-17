@@ -32,6 +32,10 @@ def negate_rule(rule):
 
     if rule.startswith('not('):
         negated_rule = rule[4:-1]
+    elif rule.startswith('less('):
+        negated_rule = 'greater(' + rule[5:]
+    elif rule.startswith('greater('):
+        negated_rule = 'less(' + rule[len('greater(') + 1:]
     else:
         negated_rule = 'not(' + rule + ')'
 

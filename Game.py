@@ -142,13 +142,13 @@ class Game:
                 combineRulesWithOperator(rule_set, 'and')).evaluate(cards):
                 # all of the subrules were true for this cards, what should
                 # be done?
-                # Suppose the rule_set was p & q and the given cards can be
-                # descibed by p & q & r & s. Now we search all card sequences
-                # that are only accepted by this rule_set and find the set of
-                # their properties, which becomes {p, q, r, t, u}. Now the
-                # updated rule_set should be p & q & !s, since s was not in
-                # the set of attributes that previous accepted card sequences
-                # had.
+                # Suppose the rule_set was p & q and the given rejected cards
+                # can be described by p & q & r & s. Now we search all card
+                # sequences that are only accepted by this rule_set and find
+                # the set of their properties, which becomes {p, q, r, t, u}.
+                # Now the updated rule_set should be p & q & !s, since s was
+                # not in the set of attributes that previous accepted card
+                # sequences had.
                 attr_set = set()
                 for i in range(len(self.board_state) - 2):
                     c_seq = list(map(lambda c: c[0], self.board_state[i:i+3]))
@@ -166,13 +166,9 @@ class Game:
                     rule_set.append(negate_rule(r))
 
             else:
-                new_rule_set = []
-                for r in rule_set:
-                    if not parse(r).evaluate(cards):
-                        new_rule_set.append(r)
-                rule_set.clear()
-                for r in new_rule_set:
-                    rule_set.append(r)
+                # if the rule didn't accept the card, then there is no need
+                # to change the rule, we can leave it as is
+                continue
 
     def simplifyRules(self):
         """

@@ -328,7 +328,7 @@ def combineListOfRules(ruleList):
 
     Parameters
     ----------
-    ruleList: list:
+    ruleList: list
         List of string representation of rules, or list of lists of string
         representation of the rules
 
@@ -350,7 +350,7 @@ def combineListOfRules(ruleList):
     # combine the whole thing with OR
     total_rule = combineRulesWithOperator(or_list, "or")
 
-    return parse(total_rule)
+    return total_rule
 
 
 def getRandomRule():

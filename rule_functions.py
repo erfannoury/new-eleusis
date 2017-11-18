@@ -3,13 +3,43 @@ This file contains helper functions for rules
 """
 import random
 from new_eleusis import *
-from itertools import combinations
+from itertools import combinations, product
 
 ALL_CARDS = []
 for deck in ["D", "H", "S", "C"]:
     for num in ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10",
                 "J", "Q", "K"]:
         ALL_CARDS.append(num+deck)
+
+
+def negate_rule(rule):
+    """
+    Negates the given rule expression
+
+    Parameters
+    ----------
+    rule: str or new_eleusis.Tree
+        String representation of a rule
+
+    Returns
+    -------
+    negated_rule: str
+        String representation of the negated rule
+    """
+    assert type(rule) in [str, Tree]
+    if type(rule) == Tree:
+        rule = str(rule)
+
+    if rule.startswith('not('):
+        negated_rule = rule[4:-1]
+    elif rule.startswith('less('):
+        negated_rule = 'greater(' + rule[5:]
+    elif rule.startswith('greater('):
+        negated_rule = 'less(' + rule[len('greater(') + 1:]
+    else:
+        negated_rule = 'not(' + rule + ')'
+
+    return negated_rule
 
 
 def getAllValidSequences(rule):
@@ -28,7 +58,7 @@ def getAllValidSequences(rule):
         List of three-cards that are accepted by the rule
     """
     goodList = []
-    for card1, card2, card3 in combinations(ALL_CARDS, r=3):
+    for card1, card2, card3 in product(ALL_CARDS, repeat=3):
         if rule.evaluate([card1, card2, card3]):
             goodList.append(card1 + card2 + card3)
     return goodList
@@ -47,8 +77,8 @@ def getRulesForSequence(cards):
 
     Returns
     -------
-    all_thress: list
-        A list of rule trees that accept the given sequence of three cards
+    all_rules: list
+        A list of rule strings that accept the given sequence of three cards
     """
     assert len(cards) == 3, 'Three cards should be provided'
 
@@ -77,12 +107,7 @@ def getRulesForSequence(cards):
 
     all_rules = all_one_card_rules + all_two_card_rules + all_three_card_rules
 
-    # turn the rules into trees
-    all_trees = []
-    for rule in all_rules:
-        all_trees.append(parse(rule))
-
-    return all_trees
+    return all_rules
 
 
 def getRulesForThreeCards(cards):
@@ -207,9 +232,10 @@ def getRulesForTwoCards(cards, cur_name="current", prev_name="previous"):
     # are the value, suit,color royalty, or parity the same?
     for func in same_funcs:
         if same_funcs[func](cur) == same_funcs[func](prev):
-            all_pair_rules.append(
-                "equal(" + func + "(" + cur_name + "), " +
-                func + "(" + prev_name + "))")
+            # when an attribute is equal for two consecutive cards, then this
+            # attribute is a rank-1 attribute and so we don't need to have
+            # these rules
+            continue
         else:
             all_pair_rules.append(
                 "not(equal(" + func + "(" + cur_name + "), " +
@@ -248,7 +274,9 @@ def getRulesForTwoCards(cards, cur_name="current", prev_name="previous"):
     prev_rules = getRulesForOneCard(prev, cur_name=prev_name)
     cur_rules = getRulesForOneCard(cur, cur_name=cur_name)
     for rp, rc in zip(prev_rules, cur_rules):
-        all_pair_rules.append("and(" + rp + ", " + rc + ")")
+        # again, remove the rules that are the same for two consecutive cards
+        if rp.replace(prev_name, '') != rc.replace(cur_name, ''):
+            all_pair_rules.append("and(" + rp + ", " + rc + ")")
 
     return all_pair_rules
 
@@ -292,12 +320,15 @@ def combineListOfRules(ruleList):
 
     Parameters
     ----------
-    ruleList: list:
+    ruleList: list
         List of string representation of rules, or list of lists of string
         representation of the rules
 
-    total_rule: Tree
-        The resulting rule tree from combining the given rules
+    Returns
+    -------
+    total_rule: str
+        The resulting string representation of the rule from combining the
+        given rules
     """
     if type(ruleList[0]) is not list:
         # it is a one-dimensional list, so just AND everything together
@@ -312,7 +343,7 @@ def combineListOfRules(ruleList):
     # combine the whole thing with OR
     total_rule = combineRulesWithOperator(or_list, "or")
 
-    return parse(total_rule)
+    return total_rule
 
 
 def getRandomRule():

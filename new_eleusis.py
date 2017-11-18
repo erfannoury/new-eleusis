@@ -97,8 +97,15 @@ def greater(a, b):
 def plus1(x):
     """Returns the next higher value, suit, or card in a suit;
        must be one. If a color, returns the other color"""
+    if type(x) == int:
+        if x == 13:
+            return number_to_value(1)
+        #assert x < 13
+        return number_to_value(x + 1)
     if is_value(x):
-        assert value_to_number(x) < 13
+        #assert value_to_number(x) < 13
+        if value_to_number(x) == 13:
+            return number_to_value(1)
         return number_to_value(value_to_number(x) + 1)
     elif is_suit(x):
         assert x != 'S'
@@ -112,7 +119,14 @@ def plus1(x):
 def minus1(x):
     """Returns the next lower value, suit, or card in a suit;
        must be one. If a color, returns the other color"""
+    if type(x) == int:
+        if x == 1:
+            return number_to_value(13)
+        assert x > 1
+        return number_to_value(x - 1)
     if is_value(x):
+        if value_to_number(x) == 1:
+            return number_to_value(13)
         assert value_to_number(x) > 1
         return number_to_value(value_to_number(x) - 1)
     elif is_suit(x):

@@ -68,7 +68,7 @@ class Game:
         """
         return self.board_state
 
-    def chooseCard(self):
+    def chooseCard(self, turn=None):
         """
         This function chooses which card to play next
 
@@ -77,7 +77,23 @@ class Game:
         card: str
             The next card to play
         """
-        # TODO: implement it
+        prev = self.board_state[-1][0]
+        prev2 = self.board_state[-2][0]
+
+        rule_tree = parse(combineListOfRules(self.hypothesis_set))
+        candidate_cards = []
+        if turn is None:
+            return random.choice(ALL_CARDS)
+        elif turn % 2 == 0:
+            random.shuffle(ALL_CARDS)
+            for cur in ALL_CARDS:
+                if rule_tree.evaluate([prev2, prev, cur]):
+                    return cur
+        else:
+            random.shuffle(ALL_CARDS)
+            for cur in ALL_CARDS:
+                if not rule_tree.evaluate([prev2, prev, cur]):
+                    return cur
         return random.choice(ALL_CARDS)
 
     def applyAcceptedCard(self, current):

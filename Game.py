@@ -307,18 +307,6 @@ class Game:
             self.board_state[-1][1].append(card)
         return valid
 
-    def findBestRule(self):
-        """
-        Returns the most likely rule guessed so far
-
-        Returns
-        -------
-        rule: tree
-            The rule tree describing the most likely rule guessed so far
-        """
-        # NOTE: right now just returns the most specific rule
-        return combineListOfRules(self.hypothesis_set)
-
     def getValidCards(self):
         """
         Gets a card or set of cards that is valid with the game rule

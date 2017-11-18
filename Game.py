@@ -248,7 +248,7 @@ class Game:
                 print(rule_set)
             print('\n\n')
 
-        return self.findBestRule()
+        return combineListOfRules(self.hypothesis_set)
 
     def score(self):
         """
@@ -273,7 +273,7 @@ class Game:
                 if cardsPlayed > 20:
                     score += 2
 
-        guessedRule = self.findBestRule()
+        guessedRule = combineListOfRules(self.hypothesis_set)
         validReal = set(self.true_valid)
         validGuess = set(getAllValidSequences(parse(guessedRule)))
 

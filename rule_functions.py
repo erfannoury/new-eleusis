@@ -326,8 +326,9 @@ def combineListOfRules(ruleList):
 
     Returns
     -------
-    total_rule: Tree
-        The resulting rule tree from combining the given rules
+    total_rule: str
+        The resulting string representation of the rule from combining the
+        given rules
     """
     if type(ruleList[0]) is not list:
         # it is a one-dimensional list, so just AND everything together

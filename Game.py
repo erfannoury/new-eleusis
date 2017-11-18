@@ -113,7 +113,7 @@ class Game:
         # first check to see if any of the rule sets accept this card
         for rule_set in self.hypothesis_set:
             if parse(combineRulesWithOperator(rule_set, 'and')).evaluate(
-                cards):
+                    cards):
                 return
 
         add_new_set = True
@@ -131,16 +131,15 @@ class Game:
                 for r in new_rule_set:
                     rule_set.append(r)
 
+        if add_new_set:
+            self.hypothesis_set.append(getRulesForSequence(cards))
+
         new_hypothesis_set = []
         for rule_set in self.hypothesis_set:
             if len(rule_set) > 0:
                 new_hypothesis_set.append(rule_set)
 
         self.hypothesis_set = new_hypothesis_set
-
-
-        if add_new_set:
-            self.hypothesis_set.append(getRulesForSequence(cards))
 
     def applyRejectedCard(self, current):
         """
@@ -247,13 +246,13 @@ class Game:
             for rule_set in self.hypothesis_set:
                 print(rule_set)
             print('\n\n')
+            print("Current Score is", self.score())
 
         return combineListOfRules(self.hypothesis_set)
 
     def score(self):
         """
         This function returns the score for the game played so far
-        TODO: NEED TO ADD THE +30 FOR A RULE THAT DOESN'T DESCRIBE ALL CARDS
 
         Returns
         -------
@@ -262,11 +261,13 @@ class Game:
         """
         score = 0
         cardsPlayed = 0
+
         for play in self.board_state:
             # look at legal plays
             cardsPlayed += 1
             if cardsPlayed > 20:
                 score += 1
+
             # look at illegal plays
             for card in play[1]:
                 cardsPlayed += 1
@@ -274,10 +275,24 @@ class Game:
                     score += 2
 
         guessedRule = combineListOfRules(self.hypothesis_set)
-        validReal = set(self.true_valid)
-        validGuess = set(getAllValidSequences(parse(guessedRule)))
+        # Now check that the rule describes all of the cards played
+        describes = True
+        guessedTree = parse(guessedRule)
+        for i in range(2,len(self.board_state)):
+            if not guessedTree.evaluate(
+                [self.board_state[i-2][0], self.board_state[i-1][0],
+                 self.board_state[i][0]]):
+                describes = False
+            for failedCard in self.board_state[i][1]:
+                if guessedTree.evaluate(
+                    [self.board_state[i-1][0], self.board_state[i][0],
+                     failedCard]):
+                    describes = False
+        if not describes:
+            score += 30
 
-        # If the two sets of valid sequences are the same,
+        validReal = set(getAllValidSequences(self.true_rule))
+        validGuess = set(getAllValidSequences(guessedTree))
         # the rules are the same
         if len(validGuess ^ validReal) > 0:
             score += 15

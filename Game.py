@@ -210,7 +210,13 @@ class Game:
         """
         The function that runs the game. It plays 20 cards and tries to
         guess the rule
-        :return:
+
+        Returns
+        -------
+        bestrule: str
+            The string representation of the best rule we have found by playing
+            for 100 turns
+
         """
         cards = self.getValidCards()
         print("got valid cards:", cards)
@@ -226,10 +232,10 @@ class Game:
         self.hypothesis_set.append(one_card_rules + two_card_rules)
         print("The current guess is", combineListOfRules(self.hypothesis_set))
 
-        for turn in range(20):
-            print("Turn:", turn)
-            chosen = self.chooseCard()
-            print("Playing", chosen, "card")
+        for turn in range(100):
+            print("Turn:", turn + 1)
+            chosen = self.chooseCard(turn=turn)
+            print("Playing", chosen)
             if self.play(chosen):
                 print(chosen, "was legal")
                 self.applyAcceptedCard(chosen)
@@ -237,8 +243,10 @@ class Game:
                 print(chosen, "was illegal")
                 self.applyRejectedCard(chosen)
             self.simplifyRules()
-            print("Current Score is", self.score())
-            print(self.boardState(), "\n")
+            print(self.boardState())
+            for rule_set in self.hypothesis_set:
+                print(rule_set)
+            print('\n\n')
 
         return self.findBestRule()
 

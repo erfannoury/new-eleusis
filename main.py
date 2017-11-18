@@ -5,36 +5,37 @@ from Game import *
 
 
 def main():
-    print("Hello! Welcome to the main for new_eleusis.py")
-    # default, red must follow black
+    rules = []
+    rules.append("if(greater(value(previous), value(current)), True)")
+    rules.append("greater(value(previous), value(current))")
+    rules.append("equal(minus1(value(previous)), value(current))")
+    rules.append("equal(is_royal(current), False)")
+    rules.append('equal(equal(color(previous), B), equal(color(current), R))')
+    rules.append("and(equal(color(current), R), even(current))")
+    rules.append("""and(not(equal(suit(previous), suit(current))),equal(color
+                 (previous), color(current)))""")
+    rules.append("""and(equal(suit(current), suit(previous)), greater(value
+                 (current), value(previous)))""")
 
-    # cards = ["5S", "AH", "JH"]
-
-    # print("The three cards are:", cards)
-    # rules = getRulesForSequence(cards)
-    # print("Their properties and'd together are:")
-    # print(combineListOfRules(rules))
-
-    # cards2 = ["4H", "3S", "QD"]
-    # print("another set of cards are", cards2)
-    # rules2 = getRulesForSequence(cards2)
-    # print("Their properties and'd together are:")
-    # print(combineListOfRules(rules2))
-
-    # print("If we combine both lists of rules we get:")
-    # print(combineListOfRules([rules, rules2]))
-
-    # The values need to be increasing
-    # rule = "if(greater(value(previous), value(current)), True, False)"
-
-    #rule = "equal(color(current), R)"
-    rule = "not(equal(suit(previous), suit(current)))"
-    # rule = input("Please input in a rule:")
+    rule = random.choice(rules)
     theGame = Game()
-    print("The rule is", rule)
     theGame.setRule(rule)
     endRule = theGame.scientist()
-    print("The final rule was ", endRule)
+    given_set = set(getAllValidSequences(theGame.rule()))
+    print('The given rule is')
+    print(theGame.rule())
+    print('The guessed rule is')
+    print(parse(endRule))
+    guessed_set = set(getAllValidSequences(parse(endRule)))
+    print('Number of sequences of cards that are in the given rule, but not in'
+          ' the guessed rule')
+    print(len(given_set - guessed_set), 'Error rate: {}%'.format(
+        len(given_set - guessed_set) / 52 ** 3 * 100))
+    print('===================================')
+    print('Number of sequences of cards that are in the guessed rule, but not'
+          ' in the given rule')
+    print(len(guessed_set - given_set), 'Error rate: {}%'.format(
+        len(guessed_set - given_set) / 52 ** 3 * 100))
 
 
 if __name__ == '__main__':

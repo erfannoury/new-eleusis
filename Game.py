@@ -54,7 +54,6 @@ class Game:
         try:
             rule_tree = parse(rule_expr)
             self.true_rule = rule_tree
-            self.true_valid = getAllValidSequences(rule_tree)
         except:
             raise ValueError("Invalid Rule")
 

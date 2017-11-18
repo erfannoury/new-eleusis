@@ -131,6 +131,14 @@ class Game:
                 for r in new_rule_set:
                     rule_set.append(r)
 
+        new_hypothesis_set = []
+        for rule_set in self.hypothesis_set:
+            if len(rule_set) > 0:
+                new_hypothesis_set.append(rule_set)
+
+        self.hypothesis_set = new_hypothesis_set
+
+
         if add_new_set:
             self.hypothesis_set.append(getRulesForSequence(cards))
 
@@ -184,6 +192,13 @@ class Game:
                 # if the rule didn't accept the card, then there is no need
                 # to change the rule, we can leave it as is
                 continue
+
+        new_hypothesis_set = []
+        for rule_set in self.hypothesis_set:
+            if len(rule_set) > 0:
+                new_hypothesis_set.append(rule_set)
+
+        self.hypothesis_set = new_hypothesis_set
 
     def simplifyRules(self):
         """

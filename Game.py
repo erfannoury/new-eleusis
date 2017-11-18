@@ -218,7 +218,6 @@ class Game:
 
         """
         cards = self.getValidCards()
-        print("got valid cards:", cards)
         for card in cards:
             self.board_state.append((card, []))
         # Since applying the rules requires three cards to be given, therefore
@@ -229,24 +228,14 @@ class Game:
         two_card_rules = getRulesForTwoCards(cards)
 
         self.hypothesis_set.append(one_card_rules + two_card_rules)
-        print("The current guess is", combineListOfRules(self.hypothesis_set))
 
         for turn in range(100):
-            print("Turn:", turn + 1)
             chosen = self.chooseCard(turn=turn)
-            print("Playing", chosen)
             if self.play(chosen):
-                print(chosen, "was legal")
                 self.applyAcceptedCard(chosen)
             else:
-                print(chosen, "was illegal")
                 self.applyRejectedCard(chosen)
             self.simplifyRules()
-            print(self.boardState())
-            for rule_set in self.hypothesis_set:
-                print(rule_set)
-            print('\n\n')
-            print("Current Score is", self.score())
 
         return combineListOfRules(self.hypothesis_set)
 

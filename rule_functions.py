@@ -59,7 +59,11 @@ def getAllValidSequences(rule):
     """
     goodList = []
     for card1, card2, card3 in product(ALL_CARDS, repeat=3):
-        if rule.evaluate([card1, card2, card3]):
+        good = rule.evaluate([card1, card2, card3])
+        if isinstance(good,str):
+            if good == "True":
+                goodList.append(card1 + card2 + card3)
+        elif good:
             goodList.append(card1 + card2 + card3)
     return goodList
 

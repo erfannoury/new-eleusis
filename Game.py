@@ -68,33 +68,36 @@ class Game:
         """
         return self.board_state
 
-    def chooseCard(self, turn=None):
+    def chooseCard(self, hand):
         """
         This function chooses which card to play next
-
+        It takes in the available cards as a list called hand
         Returns
         -------
         card: str
             The next card to play
+
         """
+        #Get which turn we are on from how many cards have been played
+        turn = -3
+        for item in self.board_state:
+            #add one for the accepted card, and the number of rejected cards
+            turn += len(item[1]) + 1
+
+
         prev = self.board_state[-1][0]
         prev2 = self.board_state[-2][0]
 
         rule_tree = parse(combineListOfRules(self.hypothesis_set))
-        candidate_cards = []
-        if turn is None:
-            return random.choice(ALL_CARDS)
-        elif turn % 2 == 0:
-            random.shuffle(ALL_CARDS)
-            for cur in ALL_CARDS:
+        if turn % 2 == 0:
+            for cur in hand:
                 if rule_tree.evaluate([prev2, prev, cur]):
                     return cur
         else:
-            random.shuffle(ALL_CARDS)
-            for cur in ALL_CARDS:
+            for cur in hand:
                 if not rule_tree.evaluate([prev2, prev, cur]):
                     return cur
-        return random.choice(ALL_CARDS)
+        return random.choice(hand)
 
     def applyAcceptedCard(self, current):
         """
@@ -205,39 +208,44 @@ class Game:
         """
         pass
 
-    def scientist(self):
+    def scientist(self, cards, hand, game_ended):
         """
-        The function that runs the game. It plays 20 cards and tries to
-        guess the rule
+        The function that plays a card and returns either a rule or the card played
 
         Returns
         -------
-        bestrule: str
-            The string representation of the best rule we have found by playing
-            for 100 turns
+        A rule or the card played
 
         """
-        cards = self.getValidCards()
-        for card in cards:
-            self.board_state.append((card, []))
-        # Since applying the rules requires three cards to be given, therefore
-        # for the first two given cards, we populate the hypothesis set
-        # manually
-        one_card_rules = list(set(getRulesForOneCard(cards[0])) &
-                              set(getRulesForOneCard(cards[1])))
-        two_card_rules = getRulesForTwoCards(cards)
 
-        self.hypothesis_set.append(one_card_rules + two_card_rules)
+        if len(self.hypothesis_set) == 0:
+            for card in cards:
+                self.board_state.append((card, []))
+            #We get three cards to start with, so make the initial hypothesis
+            self.hypothesis_set.append(getRulesForSequence(cards))
+        else:
+            #apply the cards played by the other players to our understanding of the game
+            for card in cards:
+                if is_card(card):
+                    if self.play(card):
+                        self.applyAcceptedCard(card)
+                    else:
+                        self.applyRejectedCard(card)
 
-        for turn in range(100):
-            chosen = self.chooseCard(turn=turn)
-            if self.play(chosen):
-                self.applyAcceptedCard(chosen)
-            else:
-                self.applyRejectedCard(chosen)
-            self.simplifyRules()
+        if game_ended:
+            return combineListOfRules(self.hypothesis_set)
 
-        return combineListOfRules(self.hypothesis_set)
+
+        chosen = self.chooseCard(hand)
+        if self.play(chosen):
+            self.applyAcceptedCard(chosen)
+        else:
+            self.applyRejectedCard(chosen)
+        self.simplifyRules()
+
+        #return combineListOfRules(self.hypothesis_set)
+        #TODO: return a rule if it hasn't changed in L amount of turns
+        return chosen
 
     def score(self):
         """
@@ -305,10 +313,18 @@ class Game:
         previous = self.board_state[-1][0]
         previous2 = self.board_state[-2][0]
         valid = self.true_rule.evaluate([previous2, previous, card])
-        if valid:
-            self.board_state.append((card, []))
+        if isinstance(valid,str):
+            if valid == "True":
+                self.board_state.append((card, []))
+                valid = True
+            else:
+                self.board_state[-1][1].append(card)
+                valid = False
         else:
-            self.board_state[-1][1].append(card)
+            if valid:
+                self.board_state.append((card, []))
+            else:
+                self.board_state[-1][1].append(card)
         return valid
 
     def getValidCards(self):
@@ -328,7 +344,8 @@ class Game:
         shuffleList = ALL_CARDS
         random.shuffle(shuffleList)
         for card1, card2, card3 in combinations(shuffleList, r=3):
-            if self.true_rule.evaluate([card1, card2, card3]):
+            good = self.true_rule.evaluate([card1, card2, card3])
+            if good == "True" or (good != "False" and good != False):
                 for card4 in shuffleList:
                     if card4 == card3 or card4 == card2:
                         continue

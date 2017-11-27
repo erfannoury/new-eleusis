@@ -14,6 +14,7 @@ def is_color(s):
 
 def is_value(s):
     """Test if parameter is a number or can be interpreted as a number"""
+    s = str(s)
     return s.isdigit() or (len(s) == 1 and s[0] in "AJQK")
 
 
@@ -73,18 +74,18 @@ def less(a, b):
        colors, or values. For suits: C < D < H < S. For colors,
        B < R. For cards, suits are considered first, then values.
        Values are compared numerically."""
-    # had to fix this so if you passed in greater(value(card),value(card))
-    # it wouldn't error
-    if is_value(str(a)):
-        if a in ["J", "Q", "K", "A"] or b in ["J", "Q", "K", "A"]:
-            return value_to_number(a) < value_to_number(b)
-        else:
-            return a < b
-    elif is_card(a):
+    if is_card(a):
         if suit(a) != suit(b):
             return suit(a) < suit(b)
         else:
             return value(a) < value(b)
+    elif is_value(a):
+        map = {'1': 'A', '11': 'J', '12': 'Q', '13': 'K'}
+        if a in map.keys():
+            a = map[a]
+        if b in map.keys():
+            b = map[b]
+        return value_to_number(a) < value_to_number(b)
     else:
         return a < b
 
@@ -208,30 +209,6 @@ def scan(s):
         yield token
 
 
-def tree(s):
-    """Given a function in the usual "f(a, b)" notation, returns
-       a Tree representation of that function, for example,
-       equal(color(current),'R') becomes
-       Tree(equal(Tree(color(current)),'R')) """
-    tokens = list(scan(s))
-    if len(tokens) == 1:
-        return tokens[0]
-    expr = ""
-    functions = []  # a stack of functions
-    args = []      # a stack of argument lists
-    depth = 0
-    for i in range(0, len(tokens) - 1):
-        if tokens[i + 1] == '(':
-            f = to_function[tokens[i]]
-            depth += 1
-        expr += tokens[i]
-        if tokens[i] == ')':
-            expr += ')'
-            depth -= 1
-    assert depth == 1, "*** Unmatched parentheses ***"
-    return expr + '))'
-
-
 def combine(f, args):
     """Makes a Tree from a function and a list of arguments"""
     if len(args) == 1:
@@ -268,7 +245,7 @@ class Tree:
         """Create a new Tree; default is no children"""
         self.root = root
         assert root in functions
-        if third is None:
+        if third == None:
             self.test = None
             self.left = first
             self.right = second
@@ -279,15 +256,14 @@ class Tree:
 
     def __str__(self):
         """Provide a printable representation of this Tree"""
-        if self.test is not None:  # it's an iff Tree
+        if self.test != None:  # it's an iff Tree
             return 'iff({}, {}, {})'.format(self.left, self.right, self.test)
-        if self.left is None and self.right is None:
+        if self.left == None and self.right == None:
             return str(self.root)
-        elif self.right is None:
+        elif self.right == None:
             return '{}({})'.format(self.root.__name__, self.left)
         else:
-            return '{}({}, {})'.format(
-                self.root.__name__, self.left, self.right)
+            return '{}({}, {})'.format(self.root.__name__, self.left, self.right)
 
     def __repr__(self):
         s = "Tree("
@@ -295,11 +271,11 @@ class Tree:
             s += self.root.__name__
         else:
             str(self.root) + '!'
-        if self.left is not None:
+        if self.left != None:
             s += ", " + repr(self.left)
-        if self.right is not None:
+        if self.right != None:
             s += ", " + repr(self.right)
-        if self.test is not None:
+        if self.test != None:
             s += ", " + repr(self.test)
         return s + ")"
 
@@ -325,6 +301,10 @@ class Tree:
                 elif expr == "previous2":
                     return previous2
                 else:
+                    if expr == "True":
+                        expr = True
+                    elif expr == "False":
+                        expr = False
                     return expr
         try:
             (previous2, previous, current) = cards

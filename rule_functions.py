@@ -12,6 +12,13 @@ for deck in ["D", "H", "S", "C"]:
         ALL_CARDS.append(num+deck)
 
 
+def generate_random_card():
+    values = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+    suits = ["S", "H", "D", "C"]
+    return values[randint(0, len(values) - 1)] + \
+        suits[randint(0, len(suits) - 1)]
+
+
 def negate_rule(rule):
     """
     Negates the given rule expression

@@ -1,6 +1,6 @@
 # Put your program name in place of program_name
 
-import game
+import Game
 from random import randint
 from new_eleusis import *
 

@@ -74,6 +74,8 @@ def less(a, b):
        colors, or values. For suits: C < D < H < S. For colors,
        B < R. For cards, suits are considered first, then values.
        Values are compared numerically."""
+    if isinstance(a, int):
+        return a < b
     if is_card(a):
         if suit(a) != suit(b):
             return suit(a) < suit(b)

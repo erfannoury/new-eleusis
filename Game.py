@@ -2,7 +2,7 @@
 Contains the Player class
 """
 from rule_functions import *
-import phase2
+
 
 
 class Player:
@@ -22,39 +22,14 @@ class Player:
         self.board_state = []
         for c in cards:
             self.board_state.append((c, []))
+        self.hypothesis_set = []
         self.applyAcceptedCard(cards[2])
 
         self.hand = [generate_random_card() for i in range(14)]
-        self.hypothesis_set = []
+
         self.turn = 0
 
-    def rule(self):
-        """
-        This function returns the game rule to the user
-        TODO: This function should be removed
 
-        Returns
-        -----------
-        true_rule: Tree
-            The rule tree that we have estimated so far in the game
-        """
-        return self.true_rule
-
-    def setRule(self, rule_expr):
-        """
-        This function sets a given rule for a game
-        TODO: This function should be removed
-
-        Parameters
-        ----------
-        rule_expr: str
-            String representation of a rule
-        """
-        try:
-            rule_tree = parse(rule_expr)
-            self.true_rule = rule_tree
-        except:
-            raise ValueError("Invalid Rule")
 
     def boardState(self):
         """
@@ -67,10 +42,9 @@ class Player:
         """
         return self.board_state
 
-    def chooseCard(self, hand):
+    def chooseCard(self):
         """
         This function chooses which card to play next
-        It takes in the available cards as a list called hand
         Returns
         -------
         card: str
@@ -82,14 +56,14 @@ class Player:
 
         rule_tree = parse(combineListOfRules(self.hypothesis_set))
         if self.turn % 2 == 0:
-            for cur in hand:
+            for cur in self.hand:
                 if rule_tree.evaluate([prev2, prev, cur]):
                     return cur
         else:
-            for cur in hand:
+            for cur in self.hand:
                 if not rule_tree.evaluate([prev2, prev, cur]):
                     return cur
-        return random.choice(hand)
+        return random.choice(self.hand)
 
     def applyAcceptedCard(self, current):
         """
@@ -198,56 +172,8 @@ class Player:
         """
         This function gets rid of any redundant rules
         """
-        pass
+        return combineListOfRules(self.hypothesis_set)
 
-    def score(self):
-        """
-        This function returns the score for the game played so far
-        TODO: This function should no more be part of this class
-
-        Returns
-        -------
-        score: int
-            Score of the game played so far
-        """
-        score = 0
-        cardsPlayed = 0
-
-        for play in self.board_state:
-            # look at legal plays
-            cardsPlayed += 1
-            if cardsPlayed > 20:
-                score += 1
-
-            # look at illegal plays
-            for card in play[1]:
-                cardsPlayed += 1
-                if cardsPlayed > 20:
-                    score += 2
-
-        guessedRule = combineListOfRules(self.hypothesis_set)
-        # Now check that the rule describes all of the cards played
-        describes = True
-        guessedTree = parse(guessedRule)
-        for i in range(2,len(self.board_state)):
-            if not guessedTree.evaluate(
-                [self.board_state[i-2][0], self.board_state[i-1][0],
-                 self.board_state[i][0]]):
-                describes = False
-            for failedCard in self.board_state[i][1]:
-                if guessedTree.evaluate(
-                    [self.board_state[i-1][0], self.board_state[i][0],
-                     failedCard]):
-                    describes = False
-        if not describes:
-            score += 30
-
-        validReal = set(getAllValidSequences(self.true_rule))
-        validGuess = set(getAllValidSequences(guessedTree))
-        # the rules are the same
-        if len(validGuess ^ validReal) > 0:
-            score += 15
-        return score
 
     def update_card_to_boardstate(self, card, result):
         """
@@ -270,7 +196,7 @@ class Player:
             self.board_state[-1][1].append(card)
             self.applyRejectedCard(card)
 
-    def play(self):
+    def play(self, game_ended = False):
         """
         Either plays a card or returns a rule
 
@@ -283,18 +209,19 @@ class Player:
             The rule hypothesized so far
         """
 
-        if phase2.game_ended:
+        if game_ended:
             return combineListOfRules(self.hypothesis_set)
 
         # TODO: if we think the game should end
         # phase2.game_ended = True
         # return combineListOfRules(self.hypothesis_set)
 
-        chosen = self.chooseCard(hand)
+        chosen = self.chooseCard()
         self.hand.append(generate_random_card())
+        del self.hand[0]
         return chosen
 
-    def getValidCards(self):
+    '''def getValidCards(self):
         """
         Gets a card or set of cards that is valid with the game rule
         (only called for the first turn)
@@ -318,4 +245,92 @@ class Player:
                         continue
                     if self.true_rule.evaluate([card2, card3, card4]):
                         # returns two cards that have both been "current"
-                        return [card3, card4]
+                        return [card3, card4]'''
+
+
+
+class Scorer:
+    """
+       The Scorer class which contains an object that scores players
+       """
+    def __init__(self):
+        pass
+
+    def rule(self):
+        """
+        This function returns the game rule to the user
+        TODO: This function should be removed
+
+        Returns
+        -----------
+        true_rule: Tree
+            The rule tree that we have estimated so far in the game
+        """
+        return self.true_rule
+
+    def setRule(self, rule_expr):
+        """
+        This function sets a given rule for a game
+        TODO: This function should be removed
+
+        Parameters
+        ----------
+        rule_expr: str
+            String representation of a rule
+        """
+        try:
+            rule_tree = parse(rule_expr)
+            self.true_rule = rule_tree
+        except:
+            raise ValueError("Invalid Rule")
+
+
+    def score(self, player, player_ended_game):
+        """
+        This function returns the score for a given player object
+
+        Returns
+        -------
+        score: int
+            Score of the game played so far
+        """
+        print("Inside the score function")
+        score = 0
+        cardsPlayed = 0
+        boardState = player.boardState()
+
+        for play in boardState:
+            # look at legal plays
+            cardsPlayed += 1
+            if cardsPlayed > 20:
+                score += 1
+
+            # look at illegal plays
+            for card in play[1]:
+                cardsPlayed += 1
+                if cardsPlayed > 20:
+                    score += 2
+
+        guessedRule = combineListOfRules(player.hypothesis_set)
+        # Now check that the rule describes all of the cards played
+        describes = True
+        guessedTree = parse(guessedRule)
+        for i in range(2,len(boardState)):
+            if not guessedTree.evaluate(
+                [boardState[i-2][0], boardState[i-1][0],
+                 boardState[i][0]]):
+                describes = False
+            for failedCard in boardState[i][1]:
+                if guessedTree.evaluate(
+                    [boardState[i-1][0],boardState[i][0],
+                     failedCard]):
+                    describes = False
+        if not describes:
+            score += 30
+
+        validReal = set(getAllValidSequences(self.true_rule))
+        validGuess = set(getAllValidSequences(guessedTree))
+        # the rules are the same
+        if len(validGuess ^ validReal) > 0:
+            score += 15
+        return score

@@ -100,6 +100,9 @@ def greater(a, b):
 def plus1(x):
     """Returns the next higher value, suit, or card in a suit;
        must be one. If a color, returns the other color"""
+    # TODO: I think we need to revert it to the original implementation and
+    # take into account the case when we can no longer have a larger valued
+    # card which means that the game is finished
     if type(x) == int:
         if x == 13:
             return number_to_value(1)

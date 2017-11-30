@@ -4,7 +4,6 @@ Contains the Player class
 from rule_functions import *
 
 
-
 class Player:
     """
     The Player class which contains the logic of the New Eleusis game.
@@ -17,6 +16,7 @@ class Player:
         is a list (can be empty) which are the cards played after the last
         legal card which were illegal according to the dealer.
     """
+
     def __init__(self, cards):
         assert len(cards) == 3
         self.board_state = []
@@ -28,8 +28,6 @@ class Player:
         self.hand = [generate_random_card() for i in range(14)]
 
         self.turn = 0
-
-
 
     def boardState(self):
         """
@@ -130,7 +128,7 @@ class Player:
 
         for rule_set in sorted(self.hypothesis_set, key=lambda rs: len(rs)):
             if parse(
-                combineRulesWithOperator(rule_set, 'and')).evaluate(cards):
+                    combineRulesWithOperator(rule_set, 'and')).evaluate(cards):
                 # all of the subrules were true for this cards, what should
                 # be done?
                 # Suppose the rule_set was p & q and the given rejected cards
@@ -142,10 +140,11 @@ class Player:
                 # sequences had.
                 attr_set = set()
                 for i in range(len(self.board_state) - 2):
-                    c_seq = list(map(lambda c: c[0], self.board_state[i:i+3]))
+                    c_seq = list(
+                        map(lambda c: c[0], self.board_state[i:i + 3]))
                     if not any([parse(
-                        combineRulesWithOperator(rs, 'and')).evaluate(c_seq)
-                        for rs in self.hypothesis_set if rs != rule_set]):
+                            combineRulesWithOperator(rs, 'and')).evaluate(c_seq)
+                            for rs in self.hypothesis_set if rs != rule_set]):
                         attr_set.update(getRulesForSequence(c_seq))
 
                 neg_rules = []
@@ -174,7 +173,6 @@ class Player:
         """
         return combineListOfRules(self.hypothesis_set)
 
-
     def update_card_to_boardstate(self, card, result):
         """
         Update your board state with card based on the result
@@ -187,8 +185,6 @@ class Player:
             Whether the dealer accepted the card or not
         """
         self.turn += 1
-        previous = self.board_state[-1][0]
-        previous2 = self.board_state[-2][0]
         if result:
             self.board_state.append((card, []))
             self.applyAcceptedCard(card)
@@ -196,7 +192,7 @@ class Player:
             self.board_state[-1][1].append(card)
             self.applyRejectedCard(card)
 
-    def play(self, game_ended = False):
+    def play(self, game_ended=False):
         """
         Either plays a card or returns a rule
 
@@ -248,11 +244,10 @@ class Player:
                         return [card3, card4]'''
 
 
-
 class Scorer:
     """
        The Scorer class which contains an object that scores players
-       """
+    """
     def __init__(self):
         pass
 
@@ -284,8 +279,7 @@ class Scorer:
         except:
             raise ValueError("Invalid Rule")
 
-
-    def score(self, player, player_ended_game):
+    def score(self, player):
         """
         This function returns the score for a given player object
 
@@ -315,15 +309,15 @@ class Scorer:
         # Now check that the rule describes all of the cards played
         describes = True
         guessedTree = parse(guessedRule)
-        for i in range(2,len(boardState)):
+        for i in range(2, len(boardState)):
             if not guessedTree.evaluate(
-                [boardState[i-2][0], boardState[i-1][0],
-                 boardState[i][0]]):
+                    [boardState[i - 2][0], boardState[i - 1][0],
+                     boardState[i][0]]):
                 describes = False
             for failedCard in boardState[i][1]:
                 if guessedTree.evaluate(
-                    [boardState[i-1][0],boardState[i][0],
-                     failedCard]):
+                        [boardState[i - 1][0], boardState[i][0],
+                         failedCard]):
                     describes = False
         if not describes:
             score += 30

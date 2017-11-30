@@ -8,9 +8,6 @@ global game_ended
 game_ended = False
 
 
-
-
-
 class Adversary(object):
     def __init__(self):
         self.hand = [generate_random_card() for i in range(14)]
@@ -47,7 +44,6 @@ if __name__ == '__main__':
     judge = Scorer()
     judge.setRule(rule)
 
-
     cards = ["10H", "2C", "4S"]
     tree = parse(rule)
 
@@ -56,14 +52,15 @@ if __name__ == '__main__':
     adversary2 = Adversary()
     adversary3 = Adversary()
 
-    #The score function needs to know if this was the player that ended the game
+    # The score function needs to know if this was the player that ended the
+    # game
     ended_player = 0
 
     for round_num in range(14):
         try:
             # Player 1 plays
             player_card_rule = player.play()
-            print("The player played",player_card_rule)
+            print("The player played", player_card_rule)
             if is_card(player_card_rule):
                 # checking whether card played is correct or wrong
                 temp_cards = [cards[-2], cards[-1], player_card_rule]
@@ -79,7 +76,7 @@ if __name__ == '__main__':
 
             # Adversary 1 plays
             ad1_card_rule = adversary1.play()
-            print("Adversary 1 played",ad1_card_rule)
+            print("Adversary 1 played", ad1_card_rule)
             if is_card(ad1_card_rule):
                 temp_cards = [cards[-2], cards[-1], ad1_card_rule]
                 result = tree.evaluate(tuple(temp_cards))
@@ -119,20 +116,18 @@ if __name__ == '__main__':
                 ended_player = 3
                 raise Exception('')
 
-            print("The board state is:",player.boardState())
+            print("The board state is:", player.boardState())
 
         except:
             print("The game ends!")
             game_ended = True
             break
 
-
-
     # Everyone has to guess a rule
     rule_player = player.play(True)
-    print("The rule guessed by the player was",rule_player)
+    print("The rule guessed by the player was", rule_player)
 
     # Check if the guessed rule is correct and print the score
     is_player = (ended_player == 0)
-    the_score = judge.score(player, is_player)
-    print("The score for player was ",the_score)
+    the_score = judge.score(player)
+    print("The score for player was ", the_score)

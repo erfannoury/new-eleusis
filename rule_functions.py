@@ -366,7 +366,6 @@ def getRandomRule():
     rule: Tree
         A random rule tree
     """
-    possible_cards = ["current", "previous", "previous2"]
     possible_attrs_dict = {
         "color": ["R", "B"],
         "suit": ["D", "H", "S", "C"],

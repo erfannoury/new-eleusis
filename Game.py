@@ -2,6 +2,8 @@
 Contains the Player class
 """
 from rule_functions import *
+import phase2
+import random
 
 
 class Player:
@@ -205,12 +207,12 @@ class Player:
             The rule hypothesized so far
         """
 
-        if game_ended:
+        if phase2.game_ended:
             return combineListOfRules(self.hypothesis_set)
 
-        # TODO: if we think the game should end
-        # phase2.game_ended = True
-        # return combineListOfRules(self.hypothesis_set)
+        if self.constant_rule_count == self.max_rule_constancy:
+            phase2.game_ended = True
+            return combineListOfRules(self.hypothesis_set)
 
         chosen = self.chooseCard()
         self.hand.append(generate_random_card())
@@ -305,7 +307,11 @@ class Scorer:
                 if cardsPlayed > 20:
                     score += 2
 
-        guessedRule = combineListOfRules(player.hypothesis_set)
+        phase2.game_ended = True
+
+        guessedRule = player.play()
+        assert not is_card(guessedRule)
+
         # Now check that the rule describes all of the cards played
         describes = True
         guessedTree = parse(guessedRule)

@@ -1,6 +1,6 @@
 # Put your program name in place of program_name
 
-from Game import *
+import Game
 from random import randint
 from new_eleusis import *
 
@@ -41,13 +41,12 @@ class Adversary(object):
 if __name__ == '__main__':
     # Set a rule for testing
     rule = "if(is_royal(current), False)"
-    judge = Scorer()
-    judge.setRule(rule)
+    judge = Game.Scorer(rule)
 
     cards = ["10H", "2C", "4S"]
     tree = parse(rule)
 
-    player = Player(cards)
+    player = Game.Player(cards)
     adversary1 = Adversary()
     adversary2 = Adversary()
     adversary3 = Adversary()

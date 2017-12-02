@@ -1,5 +1,5 @@
 """
-Contains the Player class
+Contains the Player and Scorer classes
 """
 import random
 from rule_functions import *

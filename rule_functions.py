@@ -9,7 +9,14 @@ ALL_CARDS = []
 for deck in ["D", "H", "S", "C"]:
     for num in ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10",
                 "J", "Q", "K"]:
-        ALL_CARDS.append(num+deck)
+        ALL_CARDS.append(num + deck)
+
+
+def generate_random_card():
+    values = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+    suits = ["S", "H", "D", "C"]
+    return values[random.randint(0, len(values) - 1)] + \
+        suits[random.randint(0, len(suits) - 1)]
 
 
 def negate_rule(rule):
@@ -59,7 +66,11 @@ def getAllValidSequences(rule):
     """
     goodList = []
     for card1, card2, card3 in product(ALL_CARDS, repeat=3):
-        if rule.evaluate([card1, card2, card3]):
+        good = rule.evaluate([card1, card2, card3])
+        if isinstance(good, str):
+            if good == "True":
+                goodList.append(card1 + card2 + card3)
+        elif good:
             goodList.append(card1 + card2 + card3)
     return goodList
 
@@ -153,19 +164,19 @@ def getRulesForThreeCards(cards):
 
             # match up rules that are both comparing values
             elif prev_start in value_comp_rules \
-            and cur_start in value_comp_rules:
+                    and cur_start in value_comp_rules:
                 use = True
 
             # match up rules that are both comparing suites
             elif prev_start in suit_comp_rules \
-            and cur_start in suit_comp_rules:
+                    and cur_start in suit_comp_rules:
                 use = True
 
             # match up rules that are counting the differences between values
             elif (prev_start.startswith("equal(minus1(") or
                   prev_start.startswith("equal(plus1(")) \
-            and (cur_start.startswith("equal(minus1(") or
-                 cur_start.startswith("equal(plus1(")):
+                and (cur_start.startswith("equal(minus1(") or
+                     cur_start.startswith("equal(plus1(")):
                 use = True
 
             # append the rule that matched
@@ -248,8 +259,8 @@ def getRulesForTwoCards(cards, cur_name="current", prev_name="previous"):
         difference = value(cur) - value(prev)
         # add the rule that gives the specific distance between the cards
         all_pair_rules.append(
-            "equal(" + ("plus1(" * difference)+"value(" + prev_name + ")" +
-            (")" * difference)+", value(" + cur_name + "))")
+            "equal(" + ("plus1(" * difference) + "value(" + prev_name + ")" +
+            (")" * difference) + ", value(" + cur_name + "))")
     # if value(prev) > value(cur)
     elif greater(value(prev), value(cur)):
         all_pair_rules.append(
@@ -308,7 +319,7 @@ def combineRulesWithOperator(listOfRules, operator):
     operator = operator.lower()
     total = listOfRules[0]
     for i in range(1, len(listOfRules)):
-        total = operator + "("+total+", "+listOfRules[i]+")"
+        total = operator + "(" + total + ", " + listOfRules[i] + ")"
     return total
 
 
@@ -333,7 +344,7 @@ def combineListOfRules(ruleList):
     if type(ruleList[0]) is not list:
         # it is a one-dimensional list, so just AND everything together
         return parse(combineRulesWithOperator(
-                list(map(lambda r: str(r), ruleList)), "and"))
+            list(map(lambda r: str(r), ruleList)), "and"))
 
     or_list = []
     for a_list in ruleList:
@@ -355,7 +366,6 @@ def getRandomRule():
     rule: Tree
         A random rule tree
     """
-    possible_cards = ["current", "previous", "previous2"]
     possible_attrs_dict = {
         "color": ["R", "B"],
         "suit": ["D", "H", "S", "C"],

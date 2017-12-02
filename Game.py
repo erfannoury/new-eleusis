@@ -238,7 +238,7 @@ class Player:
 
         chosen = self.chooseCard()
         self.hand.append(generate_random_card())
-        del self.hand[0]
+        del self.hand[self.hand.index(chosen)]
         return chosen
 
 

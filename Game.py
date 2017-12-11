@@ -229,7 +229,7 @@ class Game:
 
         self.hypothesis_set.append(one_card_rules + two_card_rules)
 
-        for turn in range(100):
+        for turn in range(20):
             chosen = self.chooseCard(turn=turn)
             if self.play(chosen):
                 self.applyAcceptedCard(chosen)

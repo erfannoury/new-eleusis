@@ -1,0 +1,21 @@
+Rule,Num_real,Num_guessed,Real_not_guessed,Guessed_not_real
+equal(value(current) 5),4,1.33333333333,4.0,1.33333333333
+equal(color(current) R),2024,1937.33333333,1701.66666667,1615.0
+greater(value(current) 9),364,7102.66666667,356.333333333,7095.0
+or (equal(color(current) R) and (odd(current) equal(color(current) B))),9139,14422.6666667,8166.66666667,13450.3333333
+or ( and (is_royal(current) equal(suit(current) S)) and (not (is_royal(current)) equal(suit(current) H))),220,376.0,215.333333333,371.333333333
+and (odd(current) is_royal(current)),35,33.0,31.6666666667,29.6666666667
+not ( and (equal(value(current) 1) equal(suit(current) H))),18424,19442.6666667,15775.6666667,16794.3333333
+or (is_royal(current) equal(value(current) 3)),455,2459.66666667,444.666666667,2449.33333333
+and (even(current) equal(suit(current) D)),20,8.0,17.6666666667,5.66666666667
+and ( and (even(current) equal(suit(current) H)) greater(value(current) 5)),4,0.0,4.0,0.0
+not(equal(suit(current) suit(previous))),10695,11247.3333333,8997.66666667,9550.0
+or(and(equal(color(current) R) equal(color(previous) B)) and(equal(color(current) B) equal(color(previous) R))),4801,2554.66666667,4614.33333333,2368.0
+or(greater(value(current) value(previous)) equal(value(current) value(previous))),3318,71.3333333333,3318.0,71.3333333333
+not(and(equal(suit(previous) H) equal(suit(current) D))),17396,19338.3333333,14718.6666667,16661.0
+not(and(even(previous) and(not(equal(value(current) 7)) not(equal(value(current) 1))))),7867,13178.3333333,7109.33333333,12420.6666667
+and(and(not(equal(suit(current) suit(previous))) not(equal(suit(previous) suit(previous2)))) not(equal(suit(current) suit(previous2)))),6701,5409.0,6246.66666667,4954.66666667
+and(and(equal(value(current) value(previous)) equal(value(previous) value(previous2))) equal(value(current) value(previous2))),0,1.33333333333,0.0,1.33333333333
+not(and(and(equal(color(previous2) B) equal(color(previous) B)) equal(color(current) R))),17166,5706.66666667,16402.6666667,4943.33333333
+not(and(is_royal(current) greater(value(previous2)value(current)))),19171,19231.0,16540.3333333,16600.3333333
+or(equal(value(current) plus1(value(previous2)))equal(value(current) value(previous2))),1079,14.0,1079.0,14.0

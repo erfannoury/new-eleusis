@@ -58,9 +58,9 @@ def getAllValidSequences(rule):
         List of three-cards that are accepted by the rule
     """
     goodList = []
-    for card1, card2, card3 in product(ALL_CARDS, repeat=3):
-        if rule.evaluate([card1, card2, card3]):
-            goodList.append(card1 + card2 + card3)
+    for card1, card2, card3, card4, card5 in combinations(ALL_CARDS, r=5):
+        if rule.evaluate([card1, card2, card3]) and rule.evaluate([card2, card3, card4]) and rule.evaluate([card3, card4, card5]):
+                goodList.append(card3 + card4 + card5)
     return goodList
 
 

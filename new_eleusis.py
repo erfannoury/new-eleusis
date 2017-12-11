@@ -75,6 +75,9 @@ def less(a, b):
        Values are compared numerically."""
     # had to fix this so if you passed in greater(value(card),value(card))
     # it wouldn't error
+    if str(a).isdigit() and str(b).isdigit():
+        return int(a) < int(b)
+
     if is_value(str(a)):
         if a in ["J", "Q", "K", "A"] or b in ["J", "Q", "K", "A"]:
             return value_to_number(a) < value_to_number(b)
